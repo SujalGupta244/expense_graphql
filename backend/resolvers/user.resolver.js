@@ -1,4 +1,4 @@
-import {users} from "../dummyData/data.js"
+// import {users} from "../dummyData/data.js"
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs"
 const userResolver = {
@@ -17,7 +17,7 @@ const userResolver = {
                     throw new Error("User already exists")
                 }
 
-                const salt = await bcrypt.getSalt(10)
+                const salt = await bcrypt.genSalt(10)
 
                 const hashPassword = await bcrypt.hash(password, salt)
 
@@ -36,18 +36,18 @@ const userResolver = {
                 await context.login(newUser)
 
             } catch (error) {
-                console.error("Error in signUp: ", err)
-                throw new Error(err.message || "Internal server error")
+                console.error("Error in signUp: ", error)
+                throw new Error(error.message || "Internal server error")
             }
         },
         login: async(_, {input}, context) =>{
             try {
                 const {username, password} = input;
-
+                if(!username || !password) throw new Error("All Fields are required")
                 const {user} = await context.authenticate("graphql-local", {username, password})
                 await  context.login(user)
                 return user;
-            } catch (error) {
+            } catch (err) {
                 console.error("Error in login: ", err)
                 throw new Error(err.message || "Internal server error")
             }
@@ -55,15 +55,15 @@ const userResolver = {
         logout: async(_,__,context) =>{
             try {
                 await context.logout()
-                req.session.destroy((err)=>{
+                context.req.session.destroy((err)=>{
                     if(err) throw err;
                 })
-                res.clearCokkie('connect.sid');
+                context.res.clearCookie('connect.sid');
 
                 return {message: "Logged out successfully"}
             } catch (error) {
-                console.error("Error in logout: ", err)
-                throw new Error(err.message || "Internal server error")
+                console.error("Error in logout: ", error)
+                throw new Error(error.message || "Internal server error")
             }
         }
     },
@@ -76,7 +76,7 @@ const userResolver = {
             try {
                 const user = await User.findById(userId)
                 return user;
-            } catch (error) {
+            } catch (err) {
                 console.error("Error in user query: ", err)
                 throw new Error(err.message || "Error getting user")
             }y

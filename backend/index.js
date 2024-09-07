@@ -28,7 +28,7 @@ const httpServer = http.createServer(app);
 const MongoDBStore = connectMongo(session)
 
 const store = new MongoDBStore({
-  uri: process.env.MONGDB_URI,
+  uri: process.env.MONGODB_URI,
   collection: 'sessions'
 })
 
@@ -63,7 +63,7 @@ await server.start();
 
 
 app.use(
-  '/',
+  '/graphql',
   cors({
     origin: "http://localhost:3000",
     credentials: true,
