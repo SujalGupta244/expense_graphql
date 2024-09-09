@@ -13,9 +13,16 @@ function App() {
 	
 	// const authUser = false;
 	const {loading, error, data} = useQuery(GET_AUTHENTICATED_USER)
-	// console.log("data",data, error)
+	// console.log("data",data)
 
 	if(loading) return null;
+	if(error){
+		return (
+			<div className='flex items-center mx-auto h-screen justify-center'>
+				<h1 className="md:text-6xl text-4xl lg:text-8xl font-bold text-center  relative z-50 text-white pt-10">{error.message}</h1>
+			</div>
+		)
+	}
 	return (
 		<>
 			{data?.authUser && <Header/>}

@@ -7,13 +7,19 @@ const transactionTypeDef = `#graphql
         category: String!
         amount: Float!
         location: String
-        data: String!
+        date: String!
+    }
+
+    type CategoryStatistics {
+        category: String!
+        totalAmount: Float!
     }
 
     type Query{
         transactions: [Transaction!]
         transaction(transactionId:ID!): Transaction
         # TODO => ADD categoryStatistics query
+        categoryStatistics: [CategoryStatistics!]
 
     }
 
@@ -29,7 +35,7 @@ const transactionTypeDef = `#graphql
         category: String!
         amount: Float!
         location: String
-        data: String!
+        date: String!
     }
 
     input UpdateTransaction{
@@ -39,7 +45,7 @@ const transactionTypeDef = `#graphql
         category: String
         amount: Float
         location: String
-        data: String
+        date: String
     }
 
 `

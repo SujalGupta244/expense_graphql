@@ -13,7 +13,6 @@ const client = new ApolloClient({
 });
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <BrowserRouter>
       <GridBackground>
         <ApolloProvider client={client}>
@@ -21,5 +20,4 @@ createRoot(document.getElementById('root')).render(
         </ApolloProvider>
       </GridBackground>
     </BrowserRouter>
-  </StrictMode>,
 )
