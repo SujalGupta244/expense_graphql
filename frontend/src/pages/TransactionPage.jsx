@@ -17,6 +17,8 @@ const TransactionPage = () => {
 		}
 	)
 
+	if(!loading)console.log(data)
+
 	const [updateTransaction, {loading: loadingUpdate}] = useMutation(UPDATE_TRANSACTION,{
 		refetchQueries:["GetTransactionStatistics"]
 	})

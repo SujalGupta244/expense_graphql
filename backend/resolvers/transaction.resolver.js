@@ -1,4 +1,5 @@
 import Transaction from "../models/transaction.model.js"
+import User from "../models/user.model.js"
 const transactionResolver = {
     Query:{
         transactions: async(_,__,context) =>{
@@ -52,7 +53,7 @@ const transactionResolver = {
                 await newTransaction.save();
                 return newTransaction;
             } catch (error) {
-                console.error("Error creating transaction: ", err)
+                console.error("Error creating transaction: ", error)
                 throw new Error("Error creating transaction")
             }
         },
@@ -63,7 +64,7 @@ const transactionResolver = {
                 return updateTransaction
 
             } catch (error) {
-                console.error("Error updating transaction: ", err)
+                console.error("Error updating transaction: ", error)
                 throw new Error("Error updating transaction")
             }
         },
@@ -74,12 +75,23 @@ const transactionResolver = {
                 return deleteTransaction
 
             } catch (error) {
-                console.error("Error deleting transaction: ", err)
+                console.error("Error deleting transaction: ", error)
                 throw new Error("Error deleting transaction")
             }
         },
     },
-    // TODO => ADD TRANSACTION/USER RELATIONSHIP
+    Transaction: {
+        user: async (parent) =>{
+            const userId = parent.userId;
+            try {
+                const user = await User.findById(userId)
+                return user;
+            } catch (error) {
+                console.error("Error in user resolver: ", error)
+                throw new Error(error.message || "Internal server error")
+            }
+        }
+    }
 }
 
 export default transactionResolver
