@@ -29,7 +29,7 @@ const userResolver = {
                     name, 
                     password : hashPassword,
                     gender,
-                    profilePicture: gender == "male"? boyProfilePic : girlProfilePic
+                    profilePicture: gender.toLowerCase() == "male"? boyProfilePic : girlProfilePic
                 })
 
                 await newUser.save()
