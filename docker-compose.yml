@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 200m
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      - PORT=4000
+    restart: unless-stopped
+    # If you want to run MongoDB locally instead of Atlas, add a mongo service and update MONGODB_URI accordingly.

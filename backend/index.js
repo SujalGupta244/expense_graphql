@@ -28,6 +28,8 @@ const app = express();
 
 const httpServer = http.createServer(app);
 
+await connectDB()
+
 const MongoDBStore = connectMongo(session)
 
 const store = new MongoDBStore({
@@ -35,7 +37,7 @@ const store = new MongoDBStore({
   collection: 'sessions'
 })
 
-store.on("error",(err)=> console.log(err))
+store.on("error", (err) => console.error('Session store error:', err))
 
 app.use(
   session({
