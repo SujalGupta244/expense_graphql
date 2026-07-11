@@ -1,0 +1,56 @@
+name: Build and deploy expense_graphql
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy repository to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "~/expense_graphql"
+          recursive: true
+          rm: true
+          exclude: |
+            .git
+            node_modules
+            frontend/node_modules
+            .github
+            .env
+
+      - name: Deploy via docker compose on EC2
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            mkdir -p ~/expense_graphql
+            cd ~/expense_graphql
+            cat > .env <<EOF
+            MONGODB_URI=${{ secrets.MONGODB_URI }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            PORT=4000
+            EOF
+            sudo docker compose down || true
+            sudo docker compose up -d --build --remove-orphans
