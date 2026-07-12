@@ -21,6 +21,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend assets
+        run: |
+          npm ci --omit=dev --no-audit --no-fund
+          npm ci --prefix frontend --no-audit --no-fund
+          NODE_OPTIONS=--max_old_space_size=1048 npm run build --prefix frontend
+
       - name: Copy repository to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -52,5 +63,33 @@ jobs:
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
             PORT=4000
             EOF
+
+            sudo apt-get update
+            sudo apt-get install -y nginx
+            sudo systemctl enable nginx
+            sudo systemctl start nginx
+
+            sudo tee /etc/nginx/conf.d/expense_graphql.conf > /dev/null <<'EOF'
+            server {
+              listen 80;
+              server_name _;
+
+              location / {
+                proxy_pass http://127.0.0.1:4000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_cache_bypass $http_upgrade;
+              }
+            }
+            EOF
+
+            sudo nginx -t
+            sudo systemctl reload nginx
+
             sudo docker compose down || true
             sudo docker compose up -d --build --remove-orphans
