@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY backend ./backend
-COPY frontend/dist ./frontend/dist    # ← Copies pre-built dist from GitHub Actions
+COPY frontend/dist ./frontend/dist   
 
 EXPOSE 4000
 
