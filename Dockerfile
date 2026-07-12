@@ -2,9 +2,11 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+ENV NODE_OPTIONS=--max_old_space_size=1024
+
 COPY package*.json ./
 COPY frontend/package*.json ./frontend/
-RUN npm ci --omit=dev && npm ci --prefix frontend
+RUN npm ci --omit=dev --no-audit --no-fund && npm ci --prefix frontend --no-audit --no-fund
 
 COPY . .
 RUN npm run build --prefix frontend
