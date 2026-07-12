@@ -7,7 +7,7 @@ services:
       resources:
         limits:
           cpus: "1"
-          memory: 200m
+          memory: 500m
     ports:
       - "4000:4000"
     env_file:

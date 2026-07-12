@@ -24,11 +24,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22          # ← Match your Dockerfile node version
 
       - name: Build frontend assets
         run: |
-          npm ci --omit=dev --no-audit --no-fund
           npm ci --prefix frontend --no-audit --no-fund
           NODE_OPTIONS=--max_old_space_size=1048 npm run build --prefix frontend
 
@@ -46,6 +45,7 @@ jobs:
             .git
             node_modules
             frontend/node_modules
+            frontend/src           # ← No need to copy source files
             .github
             .env
 
@@ -55,9 +55,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
+          command_timeout: 10m      # ← Add timeout (build no longer happens here)
           script: |
             mkdir -p ~/expense_graphql
             cd ~/expense_graphql
+
             cat > .env <<EOF
             MONGODB_URI=${{ secrets.MONGODB_URI }}
             SESSION_SECRET=${{ secrets.SESSION_SECRET }}
@@ -92,4 +94,4 @@ jobs:
             sudo systemctl reload nginx
 
             sudo docker compose down || true
-            sudo docker compose up -d --build --remove-orphans
+            sudo docker compose up -d --build --remove-orphans  # ← Fast now, no vite build
